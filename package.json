@@ -34,9 +34,9 @@
     "elasticsearch": "^16.0.0",
     "express": "^4.16.4",
     "express-graphql": "^0.8.0",
-    "mongoose": "^5.5.5",
-    "mushimas": "^0.8.0",
-    "mushimas-io": "^0.1.11",
-    "mushimas-models": "0.0.9"
+    "mongoose": "^5.5.6",
+    "mushimas": "^0.9.1",
+    "mushimas-io": "^0.3.3",
+    "mushimas-models": "^1.0.2"
   }
 }

@@ -1,4 +1,4 @@
-const { Bucket, Collection } = require('mushimas-models')
+const { Bucket, Definition } = require('mushimas-models')
 const { asyncForEach } = require('./utils')
 
 class Buckets {
@@ -7,9 +7,6 @@ class Buckets {
 
     await asyncForEach(buckets, async (bucket, index) => {
       let {collections, schemas} = await this._getConfig(bucket._id)
-
-      // debugging
-      console.log(index)
 
       lambda({
         bucket: {
@@ -26,19 +23,41 @@ class Buckets {
     return await Bucket.find({ '@state': 'ACTIVE' }, { _id: 1, '@bucket': 1 }).lean()
   }
 
-  async _getAllEnabledCollections(bucketId) {
-    return await Collection.find({ '@state': 'ENABLED', '@bucketId': bucketId }, { _id: 1, '@collection': 1 }).lean()
+  async _getAllEnabledDefinitions(bucketId) {
+    return await Definition.find({ '@state': 'ENABLED', '@bucketId': bucketId }, { _id: 1, '@definition': 1 }).lean()
+  }
+
+  _parseDefinition(definition) {
+    const _class = definition.class
+    const fields = definition.fields
+
+    const parsedFields = fields.reduce((parsed, field) => {
+      parsed[field.name] = field.options
+
+      return parsed
+    }, {})
+
+    return {
+      class: _class,
+      fields: {
+        ...parsedFields
+      }
+    }
   }
 
   async _getConfig(bucketId) {
-    let collections = await this._getAllEnabledCollections(bucketId)
+    let definitions = await this._getAllEnabledDefinitions(bucketId)
 
     let namesToIds = {}
     let schemas = {}
 
-    collections.forEach(collection => {
-      namesToIds[collection['@collection'].name] = collection._id.toString()
-      schemas[collection['@collection'].name] = JSON.parse(collection['@collection'].definition)
+    definitions.forEach(definition => {
+      let schema = this._parseDefinition(definition['@definition'])
+      schemas[definition['@definition'].name] = schema
+
+      if (schema.class === 'collection') {
+        namesToIds[definition['@definition'].name] = definition._id
+      }
     })
 
     return {

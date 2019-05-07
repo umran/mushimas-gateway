@@ -1,13 +1,14 @@
-const { Bucket, Collection, Document } = require('mushimas-models')
+const { Bucket, Definition } = require('mushimas-models')
 const mongodb = require('../../src/connections/mongodb')
 const { asyncForEach } = require('../../src/utils')
+const serializeDefinition = require('./serializeDefinition')
 
 const fexbro = require('./fexbro')
 
 mongodb.init()
 
 let range = []
-for (let i=0; i<1000; i++) {
+for (let i=0; i<1; i++) {
   range.push(i)
 }
 
@@ -20,20 +21,11 @@ const populate = async () => {
 
     let bucket = await Bucket.create({ '@state': 'ACTIVE', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@organizationId': organizationId, '@bucket': { name: bucketName } })
 
-    let a = await Collection.create({ '@state': 'ENABLED', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@bucketId': bucket._id, '@collection': {
-      name: 'a',
-      definition: JSON.stringify(fexbro.a)
-    } })
+    let a = await Definition.create({ '@state': 'ENABLED', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@bucketId': bucket._id, '@definition': serializeDefinition('a', fexbro.a) })
 
-    let b = await Collection.create({ '@state': 'ENABLED', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@bucketId': bucket._id, '@collection': {
-      name: 'b',
-      definition: JSON.stringify(fexbro.b)
-    } })
+    let b = await Definition.create({ '@state': 'ENABLED', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@bucketId': bucket._id, '@definition': serializeDefinition('b', fexbro.b) })
 
-    let c = await Collection.create({ '@state': 'ENABLED', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@bucketId': bucket._id, '@collection': {
-      name: 'c',
-      definition: JSON.stringify(fexbro.c)
-    } })
+    let c = await Definition.create({ '@state': 'ENABLED', '@lastModified': ts, '@lastCommitted': ts, '@version': 0, '@bucketId': bucket._id, '@definition': serializeDefinition('c', fexbro.c) })
 
     console.log('index', i)
     console.log('bucket', bucket._id)
