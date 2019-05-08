@@ -32,7 +32,13 @@ class Buckets {
     const fields = definition.fields
 
     const parsedFields = fields.reduce((parsed, field) => {
-      parsed[field.name] = field.options
+      if (field.options.type === 'array') {
+        if (field.options.item.enabled === true) {
+          parsed[field.name] = field.options
+        }
+      } else if (field.options.enabled === true) {
+        parsed[field.name] = field.options
+      }
 
       return parsed
     }, {})
@@ -44,6 +50,8 @@ class Buckets {
       }
     }
   }
+
+  
 
   async _getConfig(bucketId) {
     let definitions = await this._getAllEnabledDefinitions(bucketId)
