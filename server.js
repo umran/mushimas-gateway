@@ -1,18 +1,18 @@
 // this is where the main express app lives
 const express = require('express')
-const Routes = require('./src/Routes')
-const Buckets = require('./src/Buckets')
+const Route = require('./src/Route')
+const Configuration = require('./src/Configuration')
 const mongodb = require('./src/connections/mongodb')
 const { port } = require('./config')
 
 const app = express()
-const routes = new Routes()
-const buckets = new Buckets()
+const route = new Route()
+const configuration = new Configuration()
 
 // define the bucket endpoint
 app.use('/bucket/:bucket', async (req, res, next) => {
   const { bucket } = req.params
-  let route = routes.get(bucket)
+  let route = route.get(bucket)
 
   if (route) {
     await route(req, res, next)
@@ -28,8 +28,8 @@ app.use('/bucket/:bucket', async (req, res, next) => {
 mongodb.init()
 
 // create routes for all active buckets
-buckets.forEachActive(({bucket, collections, schemas}) => {
-  routes.set(bucket, collections, schemas)
+configuration.forEachEnabled(({bucketId, collectionMapping, configuration}) => {
+  route.set(bucketId, collectionMapping, configuration)
 }).then(() => {
   app.listen(port)
 }).catch(err => {

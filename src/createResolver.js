@@ -3,17 +3,19 @@ const { find, findOne, search, queueCreate, queueUpdate, queueDelete } = require
 // initialize client connections here
 const elasticClient = require('./connections/elasticsearch').init()
 
-module.exports = ({ bucket, collections, schemas }) =>
+module.exports = ({ bucketId, collectionMapping, schemas }) =>
   ({ signature, elastic_projections }) =>
     async ({ method, collection, root, args, context }) => {
       
       const ackTime = new Date()
       const projection = elastic_projections[collection]
       const environment = {
-        bucket,
+        bucket: {
+          id: bucketId
+        },
         collection: {
           name: collection,
-          id: collections[collection]
+          id: collectionMapping[collection]
         }
       }
 

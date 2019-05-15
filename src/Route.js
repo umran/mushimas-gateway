@@ -2,15 +2,15 @@ const graphqlHTTP = require('express-graphql')
 const { buildGraphql } = require('mushimas')
 const createResolver = require('./createResolver')
 
-class Routes {
+class Route {
   constructor() {
     this._routes = {}
   }
 
-  _buildRoute(bucket, collections, schemas) {
+  _buildRoute(bucketId, collectionMapping, schemas) {
     const { graphqlSchema, backend } = buildGraphql(
       schemas,
-      createResolver({ bucket, collections, schemas }),
+      createResolver({ bucketId, collectionMapping, schemas }),
       false
     )
 
@@ -20,8 +20,8 @@ class Routes {
     })
   }
 
-  set(bucket, collections, schemas) {
-    let route = this._buildRoute(bucket, collections, schemas)
+  set(bucketId, collectionMapping, schemas) {
+    let route = this._buildRoute(bucketId, colelctionMapping, schemas)
 
     this._routes = {
       ...this._routes,
@@ -35,4 +35,4 @@ class Routes {
 
 }
 
-module.exports = Routes
+module.exports = Route
